@@ -142,7 +142,7 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/swigwarn.swg ${SWIG_WARN_SWG})
 set_property(SOURCE ${CMAKE_CURRENT_BINARY_DIR}/swigwarn.swg PROPERTY GENERATED 1)
 
 # install lib
-install ( DIRECTORY ${SWIG_ROOT}/Lib DESTINATION ${SWIG_LIB} )
+install ( DIRECTORY ${SWIG_ROOT}/Lib/ DESTINATION ${SWIG_LIB} )
 install ( FILES ${CMAKE_CURRENT_BINARY_DIR}/swigwarn.swg DESTINATION ${SWIG_LIB} )
 
 # Libraries
