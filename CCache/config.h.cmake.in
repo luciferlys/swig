@@ -1,95 +1,94 @@
-/* config.h.  Generated from config.h.in by configure.  */
-/* config.h.in.  Generated from configure.ac by autoheader.  */
+/* config.h.  Generated from config.h.cmake.in by CMake.  */
 
 /* Define to 1 if you would like to have zlib compression for ccache. */
-#cmakedefine01 ENABLE_ZLIB
+#cmakedefine ENABLE_ZLIB 1
 
 /* Define to 1 if you have the `asprintf' function. */
-#cmakedefine01 HAVE_ASPRINTF
+#cmakedefine HAVE_ASPRINTF 1
 
 /* */
-#cmakedefine01 HAVE_C99_VSNPRINTF
+#cmakedefine HAVE_C99_VSNPRINTF 1
 
 /* */
-#cmakedefine01 HAVE_COMPAR_FN_T
+#cmakedefine HAVE_COMPAR_FN_T 1
 
 /* Define to 1 if you have the <ctype.h> header file. */
-#cmakedefine01 HAVE_CTYPE_H
+#cmakedefine HAVE_CTYPE_H 1
 
 /* Define to 1 if you have the <dirent.h> header file, and it defines `DIR'.
    */
-#cmakedefine01 HAVE_DIRENT_H
+#cmakedefine HAVE_DIRENT_H 1
 
 /* Define to 1 if you have the `gethostname' function. */
-#cmakedefine01 HAVE_GETHOSTNAME
+#cmakedefine HAVE_GETHOSTNAME 1
 
 /* Define to 1 if you have the `getpwuid' function. */
-#cmakedefine01 HAVE_GETPWUID
+#cmakedefine HAVE_GETPWUID 1
 
 /* Define to 1 if you have the <inttypes.h> header file. */
-#cmakedefine01 HAVE_INTTYPES_H
+#cmakedefine HAVE_INTTYPES_H 1
 
 /* Define to 1 if you have the <memory.h> header file. */
-#cmakedefine01 HAVE_MEMORY_H
+#cmakedefine HAVE_MEMORY_H 1
 
 /* Define to 1 if you have the `mkstemp' function. */
-#cmakedefine01 HAVE_MKSTEMP
+#cmakedefine HAVE_MKSTEMP 1
 
 /* Define to 1 if you have the <ndir.h> header file, and it defines `DIR'. */
-#cmakedefine01 HAVE_NDIR_H
+#cmakedefine HAVE_NDIR_H 1
 
 /* Define to 1 if you have the <pwd.h> header file. */
-#cmakedefine01 HAVE_PWD_H
+#cmakedefine HAVE_PWD_H 1
 
 /* Define to 1 if you have the `realpath' function. */
-#cmakedefine01 HAVE_REALPATH
+#cmakedefine HAVE_REALPATH 1
 
 /* Define to 1 if you have the `snprintf' function. */
-#cmakedefine01 HAVE_SNPRINTF
+#cmakedefine HAVE_SNPRINTF 1
 
 /* Define to 1 if you have the <stdint.h> header file. */
-#cmakedefine01 HAVE_STDINT_H
+#cmakedefine HAVE_STDINT_H 1
 
 /* Define to 1 if you have the <stdlib.h> header file. */
-#cmakedefine01 HAVE_STDLIB_H
+#cmakedefine HAVE_STDLIB_H 1
 
 /* Define to 1 if you have the <strings.h> header file. */
-#cmakedefine01 HAVE_STRINGS_H
+#cmakedefine HAVE_STRINGS_H 1
 
 /* Define to 1 if you have the <string.h> header file. */
-#cmakedefine01 HAVE_STRING_H
+#cmakedefine HAVE_STRING_H 1
 
 /* Define to 1 if you have the <sys/dir.h> header file, and it defines `DIR'.
    */
-#cmakedefine01 HAVE_SYS_DIR_H
+#cmakedefine HAVE_SYS_DIR_H 1
 
 /* Define to 1 if you have the <sys/ndir.h> header file, and it defines `DIR'.
    */
-#cmakedefine01 HAVE_SYS_NDIR_H
+#cmakedefine HAVE_SYS_NDIR_H 1
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
-#cmakedefine01 HAVE_SYS_STAT_H
+#cmakedefine HAVE_SYS_STAT_H 1
 
 /* Define to 1 if you have the <sys/time.h> header file. */
-#cmakedefine01 HAVE_SYS_TIME_H
+#cmakedefine HAVE_SYS_TIME_H 1
 
 /* Define to 1 if you have the <sys/types.h> header file. */
-#cmakedefine01 HAVE_SYS_TYPES_H
+#cmakedefine HAVE_SYS_TYPES_H 1
 
 /* Define to 1 if you have <sys/wait.h> that is POSIX.1 compatible. */
-#cmakedefine01 HAVE_SYS_WAIT_H
+#cmakedefine HAVE_SYS_WAIT_H 1
 
 /* Define to 1 if you have the <unistd.h> header file. */
-#cmakedefine01 HAVE_UNISTD_H
+#cmakedefine HAVE_UNISTD_H 1
 
 /* Define to 1 if you have the `utimes' function. */
-#cmakedefine01 HAVE_UTIMES
+#cmakedefine HAVE_UTIMES 1
 
 /* Define to 1 if you have the `vasprintf' function. */
-#cmakedefine01 HAVE_VASPRINTF
+#cmakedefine HAVE_VASPRINTF 1
 
 /* Define to 1 if you have the `vsnprintf' function. */
-#cmakedefine01 HAVE_VSNPRINTF
+#cmakedefine HAVE_VSNPRINTF 1
 
 /* Define to the address where bug reports for this package should be sent. */
 #define PACKAGE_BUGREPORT "bugs@swig.org"
@@ -110,10 +109,22 @@
 #define PACKAGE_VERSION "0.0"
 
 /* Define to 1 if you have the ANSI C header files. */
-#cmakedefine01 STDC_HEADERS
+#cmakedefine STDC_HEADERS 1
 
 /* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
-#cmakedefine01 TIME_WITH_SYS_TIME
+#cmakedefine TIME_WITH_SYS_TIME 1
 
 /* Define _GNU_SOURCE so that we get all necessary prototypes */
-#cmakedefine01 _GNU_SOURCE
+#cmakedefine _GNU_SOURCE 1
+
+/* Deal with Microsoft's attempt at deprecating C standard runtime functions */
+#if defined(_MSC_VER)
+#ifdef _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES
+  /* it's already defined. let's get rid of it.*/
+# undef _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES
+#endif
+#define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1
+#define _CRT_SECURE_NO_DEPRECATE
+#define _CRT_SECURE_NO_WARNINGS
+#define  _CRT_NONSTDC_NO_WARNINGS
+#endif

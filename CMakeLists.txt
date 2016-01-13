@@ -1,6 +1,21 @@
-project(swig)
-
 cmake_minimum_required(VERSION 2.8)
+# avoid warning about WIN32 no longer defined in CYGWIN
+set(CMAKE_LEGACY_CYGWIN_WIN32 0) 
+
+file( STRINGS configure.ac line LIMIT_COUNT 1 REGEX "AC_INIT\\(.*\\)" )
+if( line MATCHES "AC_INIT\\(\\[(.*)\\],[ \t]*\\[(.*)\\],[ \t]*\\[(.*)\\]\\)" )
+	set( PACKAGE_NAME ${CMAKE_MATCH_1} )
+	set( PACKAGE_VERSION ${CMAKE_MATCH_2} )
+	set( PACKAGE_BUGREPORT ${CMAKE_MATCH_3} )
+endif()
+
+project( ${PACKAGE_NAME} )
+
+set( SWIG_CXX ${CMAKE_CXX_COMPILER_ID} )
+set( SWIG_PLATFORM ${CMAKE_SYSTEM_PROCESSOR}-${CMAKE_SYSTEM} )
+set( SWIG_LIB ${PROJECT_SOURCE_DIR}/Lib )
+set( SWIG_LIB_WIN_UNIX ${SWIG_LIB} )
+
 
 if ( NOT DEFINED CMAKE_BUILD_TYPE )
   set( CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Build type" )
@@ -38,6 +53,7 @@ include(CheckIncludeFile)
 include(CheckTypeSize)
 include(CheckSymbolExists)
 include(CheckLibraryExists)
+include(CheckFunctionExists)
 include(CheckCSourceCompiles)
 
 # HACK: didn't get the bool check working for Visual Studio 2008
@@ -58,6 +74,9 @@ check_include_file("string.h" HAVE_STRING_H)
 check_include_file("strings.h" HAVE_STRINGS_H)
 check_include_file("sys/stat.h" HAVE_SYS_STAT_H)
 check_include_file("sys/types.h" HAVE_SYS_TYPES_H)
+check_include_file("sys/file.h" HAVE_SYS_FILE_H)
+check_include_file("utime.h" HAVE_UTIME_H)
+check_include_file("ctype.h" HAVE_CTYPE_H)
 check_include_file("unistd.h" HAVE_UNISTD_H)
 check_include_files( "stdlib.h;stdarg.h;string.h;float.h" HAVE_STDC_HEADERS )
 
@@ -77,6 +96,7 @@ if ( USE_ZLIB )
 endif ()
 if ( ZLIB_FOUND )
   set ( ENABLE_ZLIB 1 )
+  add_definitions(-D ENABLE_ZLIB)
   include_directories ( ${ZLIB_INCLUDE_DIRS} )
 else ()
   set ( ENABLE_ZLIB 0 )
