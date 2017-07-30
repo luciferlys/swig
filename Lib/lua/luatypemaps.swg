@@ -122,14 +122,14 @@ SWIGINTERN int SWIG_lua_isnilstring(lua_State *L, int idx) {
 %{$1 = (lua_tostring(L, $input))[0];%}
 
 %typemap(out) char
-%{  lua_pushfstring(L,"%c",$1); SWIG_arg++;%}
+%{  lua_pushlstring(L, &$1, 1); SWIG_arg++;%}
 
 // by const ref
 %typemap(in,checkfn="SWIG_lua_isnilstring",fragment="SWIG_lua_isnilstring") const char& (char temp)
 %{temp = (lua_tostring(L, $input))[0]; $1=&temp;%}
 
 %typemap(out) const char&
-%{  lua_pushfstring(L,"%c",*$1); SWIG_arg++;%}
+%{  lua_pushlstring(L, $1, 1); SWIG_arg++;%}
 
 // pointers and references
 // under SWIG rules, it is ok, to have a pass in a lua nil,
@@ -235,7 +235,6 @@ $1=($1_ltype)&temp;%}
 // so the standard wrapping cannot be done
 // nor can you cast a member function pointer to a void* (obviously)
 // therefore a special wrapping functions SWIG_ConvertMember() & SWIG_NewMemberObj() were written
-#ifdef __cplusplus
 %typemap(in,checkfn="lua_isuserdata") SWIGTYPE (CLASS::*)
 %{
   if (!SWIG_IsOK(SWIG_ConvertMember(L,$input,(void*)(&$1),sizeof($type),$descriptor)))
@@ -246,7 +245,6 @@ $1=($1_ltype)&temp;%}
 %{ 
   SWIG_NewMemberObj(L,(void*)(&$1),sizeof($type),$descriptor); SWIG_arg++; 
 %}
-#endif
 
 
 // void (must be empty without the SWIG_arg++)
@@ -386,6 +384,8 @@ parameters match which function
 
 /* const pointers */
 %apply SWIGTYPE * { SWIGTYPE *const }
+%apply SWIGTYPE (CLASS::*) { SWIGTYPE (CLASS::*const) }
+%apply SWIGTYPE & { SWIGTYPE (CLASS::*const&) }
 
 // size_t (which is just a unsigned long)
 %apply unsigned long { size_t };

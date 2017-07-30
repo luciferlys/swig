@@ -1,9 +1,15 @@
 %module(directors="1") director_exception
 
+%warnfilter(SWIGWARN_TYPEMAP_DIRECTOROUT_PTR) return_const_char_star;
+
 %{
 
 #if defined(_MSC_VER)
   #pragma warning(disable: 4290) // C++ exception specification ignored except to indicate a function is not __declspec(nothrow)
+#endif
+#if __GNUC__ >= 7
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated" // dynamic exception specifications are deprecated in C++11
 #endif
 
 #include <string>
@@ -26,12 +32,27 @@ class DirectorMethodException: public Swig::DirectorException {};
 
 %include "std_string.i"
 
+#ifdef SWIGPHP
+
+%feature("director:except") {
+  if ($error == FAILURE) {
+    Swig::DirectorMethodException::raise("$symname");
+  }
+}
+
+%exception {
+	try { $action }
+	catch (Swig::DirectorException &) { SWIG_fail; }
+}
+
+#endif
+
 #ifdef SWIGPYTHON
 
 %feature("director:except") {
-	if ($error != NULL) {
-		throw Swig::DirectorMethodException();
-	}
+  if ($error != NULL) {
+    Swig::DirectorMethodException::raise("$symname");
+  }
 }
 
 %exception {
@@ -67,7 +88,7 @@ class DirectorMethodException: public Swig::DirectorException {};
 #ifdef SWIGRUBY
 
 %feature("director:except") {
-    throw Swig::DirectorMethodException($error);
+  Swig::DirectorMethodException::raise($error);
 }
 
 %exception {
@@ -106,7 +127,7 @@ Foo *launder(Foo *f) {
 %}
 
 %feature("director") Bar;
-
+%feature("director") ReturnAllTypes;
 
 %inline %{
   struct Exception1
@@ -132,4 +153,28 @@ Foo *launder(Foo *f) {
     virtual std::string pang() throw () { return "Bar::pang()"; }
   };
   
+  // Class to allow regression testing SWIG/PHP not checking if an exception
+  // had been thrown in directorout typemaps.
+  class ReturnAllTypes
+  {
+  public:
+    int call_int() { return return_int(); }
+    double call_double() { return return_double(); }
+    const char * call_const_char_star() { return return_const_char_star(); }
+    std::string call_std_string() { return return_std_string(); }
+    Bar call_Bar() { return return_Bar(); }
+
+    virtual int return_int() { return 0; }
+    virtual double return_double() { return 0.0; }
+    virtual const char * return_const_char_star() { return ""; }
+    virtual std::string return_std_string() { return std::string(); }
+    virtual Bar return_Bar() { return Bar(); }
+    virtual ~ReturnAllTypes() {}
+  };
+
+#ifdef SWIGPYTHON_BUILTIN
+bool is_python_builtin() { return true; }
+#else
+bool is_python_builtin() { return false; }
+#endif
 %}

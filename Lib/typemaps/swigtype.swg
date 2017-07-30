@@ -415,7 +415,7 @@
 }
 
 %typemap(directorin,noblock=1) SWIGTYPE {
-  $input = SWIG_NewPointerObj(%as_voidptr(&$1), $&descriptor, %newpointer_flags);
+  $input = SWIG_NewPointerObj(%as_voidptr(new $1_ltype((const $1_ltype &)$1)), $&descriptor, SWIG_POINTER_OWN | %newpointer_flags);
 }
 
 %typemap(directorin,noblock=1) SWIGTYPE & {
@@ -584,6 +584,9 @@
 }
 #endif
 
+%apply SWIGTYPE (CLASS::*) { SWIGTYPE (CLASS::*const) }
+%apply SWIGTYPE & { SWIGTYPE (CLASS::*const&) }
+
 /* ------------------------------------------------------------
  * --- function ptr typemaps --- 
  * ------------------------------------------------------------ */
@@ -625,6 +628,7 @@
 %typemap(constcode, noblock=1) SWIGTYPE ((*)(ANY)){
   %set_constant("$symname", SWIG_NewFunctionPtrObj((void *)$value, $descriptor));
 }
+%typemap(constcode) SWIGTYPE ((* const)(ANY)) = SWIGTYPE ((*)(ANY));
 
 #if defined(SWIG_DIRECTOR_TYPEMAPS)
 
