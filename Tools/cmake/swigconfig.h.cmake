@@ -71,11 +71,11 @@
 #define SWIG_CXX "@SWIG_CXX@"
 
 /* Directory for SWIG system-independent libraries */
-#define SWIG_LIB "/usr/local/share/swig/2.0.0"
+#cmakedefine SWIG_LIB "@SWIG_LIB@"
 
 /* Directory for SWIG system-independent libraries (Unix install on native
    Windows) */
-#define SWIG_LIB_WIN_UNIX "C:/cygwin/usr/local/share/swig/2.0.0"
+#cmakedefine SWIG_LIB_WIN_UNIX "@SWIG_LIB_WIN_UNIX@"
 
 /* Platform that SWIG is built for */
 #define SWIG_PLATFORM "i686-pc-cygwin"

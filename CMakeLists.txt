@@ -1,6 +1,9 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.3)
 # avoid warning about WIN32 no longer defined in CYGWIN
 set(CMAKE_LEGACY_CYGWIN_WIN32 0) 
+
+# make things appear nicer when using an IDE such as Visual Studio
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 file( STRINGS configure.ac line LIMIT_COUNT 1 REGEX "AC_INIT\\(.*\\)" )
 if( line MATCHES "AC_INIT\\(\\[(.*)\\],[ \t]*\\[(.*)\\],[ \t]*\\[(.*)\\]\\)" )
@@ -13,29 +16,23 @@ project( ${PACKAGE_NAME} )
 
 set( SWIG_CXX ${CMAKE_CXX_COMPILER_ID} )
 set( SWIG_PLATFORM ${CMAKE_SYSTEM_PROCESSOR}-${CMAKE_SYSTEM} )
-set( SWIG_LIB ${PROJECT_SOURCE_DIR}/Lib )
-set( SWIG_LIB_WIN_UNIX ${SWIG_LIB} )
-
 
 if ( NOT DEFINED CMAKE_BUILD_TYPE )
   set( CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Build type" )
 endif ()
 
-project(swig)
 
-set(SWIG_VERSION 3.0.0)
+set(SWIG_VERSION ${PACKAGE_VERSION})
 
 set(SWIG_ROOT ${PROJECT_SOURCE_DIR})
 
-set( SWIG_LIB share/swig/${SWIG_VERSION_STRING} )
+set( SWIG_LIB ${CMAKE_INSTALL_PREFIX}/share/swig/${SWIG_VERSION} )
+set( SWIG_LIB_WIN_UNIX ${SWIG_LIB} )
 
 # Project wide configuration variables
 # ------------------------------------
 
 set(SWIG_SOURCE_DIR "${SWIG_ROOT}/Source" CACHE INTERNAL "Path of swig sources" FORCE)
-
-set ( PACKAGE_NAME swig )
-set ( PACKAGE_VERSION ${SWIG_VERSION} )
 
 # Options
 # -------
@@ -57,6 +54,7 @@ include(CheckFunctionExists)
 include(CheckCSourceCompiles)
 
 # HACK: didn't get the bool check working for Visual Studio 2008
+# TODO need to revise for recent versions
 if(MSVC)
 set(HAVE_BOOL 1)
 else()
@@ -138,12 +136,12 @@ BISON_TARGET(swig_parser
 # generate swigwarn.swg
 file(READ ${SWIG_SOURCE_DIR}/Include/swigwarn.h SWIG_WARN_H)
 string(REGEX REPLACE "#define WARN([^ \\t]*)[ \\t]*([0-9]+)" "%define SWIGWARN\\1 \\2 %enddef" SWIG_WARN_SWG ${SWIG_WARN_H})
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/swigwarn.swg ${SWIG_WARN_SWG})
-set_property(SOURCE ${CMAKE_CURRENT_BINARY_DIR}/swigwarn.swg PROPERTY GENERATED 1)
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/Lib/swigwarn.swg ${SWIG_WARN_SWG})
+set_property(SOURCE ${CMAKE_CURRENT_BINARY_DIR}/Lib/swigwarn.swg PROPERTY GENERATED 1)
 
 # install lib
 install ( DIRECTORY ${SWIG_ROOT}/Lib/ DESTINATION ${SWIG_LIB} )
-install ( FILES ${CMAKE_CURRENT_BINARY_DIR}/swigwarn.swg DESTINATION ${SWIG_LIB} )
+install ( FILES ${CMAKE_CURRENT_BINARY_DIR}/Lib/swigwarn.swg DESTINATION ${SWIG_LIB} )
 
 # Libraries
 # ---------
@@ -176,6 +174,7 @@ add_library(core
     "${SWIG_SOURCE_DIR}/Swig/cwrap.c"
     "${SWIG_SOURCE_DIR}/Swig/deprecate.c"
     "${SWIG_SOURCE_DIR}/Swig/error.c"
+    "${SWIG_SOURCE_DIR}/Swig/extend.c"
     "${SWIG_SOURCE_DIR}/Swig/fragment.c"
     "${SWIG_SOURCE_DIR}/Swig/getopt.c"
     "${SWIG_SOURCE_DIR}/Swig/include.c"
@@ -207,8 +206,11 @@ add_library(modules
     "${SWIG_SOURCE_DIR}/Modules/go.cxx"
     "${SWIG_SOURCE_DIR}/Modules/guile.cxx"
     "${SWIG_SOURCE_DIR}/Modules/java.cxx"
+    "${SWIG_SOURCE_DIR}/Modules/javascript.cxx"
     "${SWIG_SOURCE_DIR}/Modules/lang.cxx"
     "${SWIG_SOURCE_DIR}/Modules/lua.cxx"
+    "${SWIG_SOURCE_DIR}/Modules/interface.cxx"
+#    "${SWIG_SOURCE_DIR}/Modules/matlab.cxx"
     "${SWIG_SOURCE_DIR}/Modules/modula3.cxx"
     "${SWIG_SOURCE_DIR}/Modules/module.cxx"
     "${SWIG_SOURCE_DIR}/Modules/mzscheme.cxx"
@@ -218,11 +220,13 @@ add_library(modules
     "${SWIG_SOURCE_DIR}/Modules/overload.cxx"
     "${SWIG_SOURCE_DIR}/Modules/perl5.cxx"
     "${SWIG_SOURCE_DIR}/Modules/php.cxx"
+    "${SWIG_SOURCE_DIR}/Modules/php5.cxx"
     "${SWIG_SOURCE_DIR}/Modules/pike.cxx"
     "${SWIG_SOURCE_DIR}/Modules/python.cxx"
     "${SWIG_SOURCE_DIR}/Modules/r.cxx"
     "${SWIG_SOURCE_DIR}/Modules/ruby.cxx"
     "${SWIG_SOURCE_DIR}/Modules/s-exp.cxx"
+    "${SWIG_SOURCE_DIR}/Modules/scilab.cxx"
     "${SWIG_SOURCE_DIR}/Modules/tcl8.cxx"
     "${SWIG_SOURCE_DIR}/Modules/typepass.cxx"
     "${SWIG_SOURCE_DIR}/Modules/uffi.cxx"
@@ -241,7 +245,11 @@ target_link_libraries ( swig cparse preprocessor doh core modules ${PCRE_LIBRARI
 install ( TARGETS swig DESTINATION bin )
 
 
-add_subdirectory ( CCache )
+if (LINUX)
+    # CCache doesn't build on Windows yet
+    add_subdirectory ( CCache )
+endif()
+  
 enable_testing()
 
 add_subdirectory ( Examples )

@@ -5,6 +5,9 @@ if (HAVE_SYSTEM_GETOPT)
 else()
   # CCache will have a replacement for it
 endif()
+check_function_exists (vsnprintf HAVE_VSNPRINTF)
+check_function_exists (snprintf HAVE_SNPRINTF)
+check_function_exists (sprintf HAVE_SPRINTF)
 
 configure_file(config.h.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/config.h )
 

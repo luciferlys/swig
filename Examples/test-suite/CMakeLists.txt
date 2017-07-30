@@ -1,5 +1,9 @@
 
-set ( SWIG_EXECUTABLE ${CMAKE_BINARY_DIR}/swig )
+set ( SWIG_EXECUTABLE $<TARGET_FILE:swig> )
+
+# some test cases use boost/smart_ptr.hpp
+find_package(Boost REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS})
 
 set ( CPP_TEST_CASES
         abstract_access
@@ -227,8 +231,6 @@ set ( CPP_TEST_CASES
         rename_scope
         rename_simple
         rename_strip_encoder
-        rename_pcre_encoder
-        rename_pcre_enum
         rename_predicates
         restrict_cplusplus
         return_const_value
@@ -395,6 +397,13 @@ set ( CPP_TEST_CASES
         wallkw
         wrapmacro)
 
+if (PCRE_FOUND)
+    list(APPEND CPP_TEST_CASES
+        rename_pcre_encoder
+        rename_pcre_enum
+    )
+endif()
+
 # TODO: remove me, for test!
 # set (CPP_TEST_CASES integers aggregate abstract_access array_member bools casts varargs_overload virtual_destructor)
   
@@ -406,8 +415,6 @@ macro(test_language language extension interpreter)
   set (${language}_interpreter ${interpreter})
   add_tests(${language})
 endmacro()
-
-
 
 include_directories ( ${CMAKE_CURRENT_SOURCE_DIR} )
 
@@ -441,7 +448,7 @@ macro(add_tests language)
     endif ()
     add_custom_command(OUTPUT ${SWIG_OUTPUT}
       COMMAND ${SWIG_EXECUTABLE} -${language} ${SWIG_CXX_FLAG}
-      -I${LANG_INCLUDE_DIR} -I${CMAKE_BINARY_DIR} -I${CMAKE_SOURCE_DIR}/Lib 
+      -I${LANG_INCLUDE_DIR} -I${CMAKE_BINARY_DIR}/Lib -I${CMAKE_SOURCE_DIR}/Lib
       -o ${SWIG_OUTPUT}
       ${CMAKE_CURRENT_SOURCE_DIR}/../${testname}.i
       DEPENDS swig
@@ -451,6 +458,9 @@ macro(add_tests language)
     set(SWIG_MODULE_${name}_REAL_NAME ${testname}_${language})
 
     add_library(${SWIG_MODULE_${name}_REAL_NAME} MODULE EXCLUDE_FROM_ALL ${SWIG_OUTPUT} )
+    # add this target to a "folder" in an IDE such as Visual Studio
+    SET_PROPERTY(TARGET ${SWIG_MODULE_${name}_REAL_NAME} PROPERTY FOLDER "test-suite/${language}")
+
     list (APPEND TEST_TARGETS ${SWIG_MODULE_${name}_REAL_NAME})
     
     set_target_properties(${SWIG_MODULE_${name}_REAL_NAME} PROPERTIES LIBRARY_OUTPUT_NAME ${testname})
@@ -466,6 +476,8 @@ macro(add_tests language)
     elseif (${language} STREQUAL octave)
       set_target_properties(${SWIG_MODULE_${name}_REAL_NAME} PROPERTIES SUFFIX ".oct")
     elseif (${language} STREQUAL python)
+      # TODO ugly to have to add this here...
+      target_link_libraries(${SWIG_MODULE_${name}_REAL_NAME} ${PYTHON_LIBRARIES})
       set_target_properties(${SWIG_MODULE_${name}_REAL_NAME} PROPERTIES LIBRARY_OUTPUT_NAME _${testname})
       if(WIN32 AND NOT CYGWIN)
         set_target_properties(${SWIG_MODULE_${name}_REAL_NAME} PROPERTIES SUFFIX ".pyd")
@@ -484,6 +496,14 @@ macro(add_tests language)
       if ( DEFINED ${language}_test_environment )
         set_tests_properties ( ${name} PROPERTIES ENVIRONMENT "${${language}_test_environment}" )
       endif ()
+      if (WIN32)
+         if (${language} STREQUAL python)
+             # the module is build in <CONFIG>, so we need to add that to the Python path
+             # TODO cannot use $<TARGET_FILE_DIR:${SWIG_MODULE_${name}_REAL_NAME}> apparently. 
+             # Currently hard-wired RelWtihDebInfo
+             set_tests_properties ( ${name} PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}/RelWithDebInfo\;${CMAKE_CURRENT_BINARY_DIR}")
+         endif()
+      endif()
     endif ()
   endforeach()
   
