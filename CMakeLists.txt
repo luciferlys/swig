@@ -176,7 +176,8 @@ add_library(core
     "${SWIG_SOURCE_DIR}/Swig/cwrap.c"
     "${SWIG_SOURCE_DIR}/Swig/deprecate.c"
     "${SWIG_SOURCE_DIR}/Swig/error.c"
-    "${SWIG_SOURCE_DIR}/Swig/fragment.c"
+    "${SWIG_SOURCE_DIR}/Swig/extend.c"
+	"${SWIG_SOURCE_DIR}/Swig/fragment.c"
     "${SWIG_SOURCE_DIR}/Swig/getopt.c"
     "${SWIG_SOURCE_DIR}/Swig/include.c"
     "${SWIG_SOURCE_DIR}/Swig/misc.c"
@@ -206,9 +207,12 @@ add_library(modules
     "${SWIG_SOURCE_DIR}/Modules/emit.cxx"
     "${SWIG_SOURCE_DIR}/Modules/go.cxx"
     "${SWIG_SOURCE_DIR}/Modules/guile.cxx"
+	"${SWIG_SOURCE_DIR}/Modules/interface.cxx"
     "${SWIG_SOURCE_DIR}/Modules/java.cxx"
+    "${SWIG_SOURCE_DIR}/Modules/javascript.cxx"
     "${SWIG_SOURCE_DIR}/Modules/lang.cxx"
     "${SWIG_SOURCE_DIR}/Modules/lua.cxx"
+    "${SWIG_SOURCE_DIR}/Modules/matlab.cxx"
     "${SWIG_SOURCE_DIR}/Modules/modula3.cxx"
     "${SWIG_SOURCE_DIR}/Modules/module.cxx"
     "${SWIG_SOURCE_DIR}/Modules/mzscheme.cxx"
@@ -223,6 +227,7 @@ add_library(modules
     "${SWIG_SOURCE_DIR}/Modules/r.cxx"
     "${SWIG_SOURCE_DIR}/Modules/ruby.cxx"
     "${SWIG_SOURCE_DIR}/Modules/s-exp.cxx"
+    "${SWIG_SOURCE_DIR}/Modules/scilab.cxx"
     "${SWIG_SOURCE_DIR}/Modules/tcl8.cxx"
     "${SWIG_SOURCE_DIR}/Modules/typepass.cxx"
     "${SWIG_SOURCE_DIR}/Modules/uffi.cxx"
@@ -241,7 +246,7 @@ target_link_libraries ( swig cparse preprocessor doh core modules ${PCRE_LIBRARI
 install ( TARGETS swig DESTINATION bin )
 
 
-add_subdirectory ( CCache )
+#add_subdirectory ( CCache )
 enable_testing()
 
 add_subdirectory ( Examples )
