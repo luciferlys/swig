@@ -25,7 +25,7 @@ FAILING_CPP_TESTS = \
 	li_std_wstring
 
 FAILING_C_TESTS = \
-	li_carrays \
+	li_carrays
 	li_cmalloc
 
 include $(srcdir)/../common.mk
